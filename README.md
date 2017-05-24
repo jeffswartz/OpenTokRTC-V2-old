@@ -143,7 +143,7 @@ Web client allows to be configured in some of its features. You can disable feat
 
 If you leave this unset, the default configuration will be used:
 ```
-//default "feedback, screensharing, archiving"
+//default "feedback,screensharing,archiving"
 ```
 To enable all features set:
 ```
