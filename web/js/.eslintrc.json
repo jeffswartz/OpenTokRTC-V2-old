@@ -1,0 +1,24 @@
+{
+  "extends": "airbnb-base",
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 5,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-expressions": "off",
+    "no-underscore-dangle": "off",
+    "func-names": "off",
+    "no-undef": "off",
+    "prefer-arrow-callback": "off",
+    "object-shorthand": "off",
+    "vars-on-top": "off",
+    "no-var": "off",
+    "comma-dangle": "off"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": false
+  }
+}

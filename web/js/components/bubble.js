@@ -88,58 +88,58 @@
 
       this.bubbleShown =
         this.bubbleShown || new Promise(function(resolve, reject) {
-        var container = bubble.container;
+          var container = bubble.container;
 
-        container.removeEventListener(transEndEventName, bubble._onHidden);
-        container.addEventListener(transEndEventName, bubble._onShown);
-        container.addEventListener(transEndEventName, function onEnd() {
-          container.removeEventListener(transEndEventName, onEnd);
-          resolve();
+          container.removeEventListener(transEndEventName, bubble._onHidden);
+          container.addEventListener(transEndEventName, bubble._onShown);
+          container.addEventListener(transEndEventName, function onEnd() {
+            container.removeEventListener(transEndEventName, onEnd);
+            resolve();
+          });
+
+          bubble._takePlace();
+          bubble._visible = true;
+          setTimeout(function () {
+            container.classList.add('show');
+          }, 50); // Give the chance to paint the UI element before fading in
         });
-
-        bubble._takePlace();
-        bubble._visible = true;
-        setTimeout(function() {
-          container.classList.add('show');
-        }, 50); // Give the chance to paint the UI element before fading in
-      });
 
       return this.bubbleShown;
     },
 
-    hide: function() {
+    hide: function () {
       var bubble = this;
 
       this.bubbleHidden =
-        this.bubbleHidden || new Promise(function(resolve, reject) {
-        var container = bubble.container;
+        this.bubbleHidden || new Promise(function (resolve) {
+          var container = bubble.container;
 
-        container.removeEventListener(transEndEventName, bubble._onShown);
-        container.addEventListener(transEndEventName, bubble._onHidden);
-        container.addEventListener(transEndEventName, function onEnd() {
-          container.removeEventListener(transEndEventName, onEnd);
-          bubble.bubbleShown = bubble.bubbleHidden = null;
-          resolve();
+          container.removeEventListener(transEndEventName, bubble._onShown);
+          container.addEventListener(transEndEventName, bubble._onHidden);
+          container.addEventListener(transEndEventName, function onEnd() {
+            container.removeEventListener(transEndEventName, onEnd);
+            bubble.bubbleShown = bubble.bubbleHidden = null;
+            resolve();
+          });
+
+          setTimeout(function () {
+            container.classList.remove('show');
+          }, 50); // Give the chance to paint the UI element before fading out
         });
-
-        setTimeout(function() {
-          container.classList.remove('show');
-        }, 50); // Give the chance to paint the UI element before fading out
-      });
 
       return this.bubbleHidden;
     },
 
-    toggle: function() {
+    toggle: function () {
       var bubble = this;
       return (bubble.bubbleShown) ? bubble.hide() : bubble.show();
     },
 
-    _onShown: function(e) {
+    _onShown: function () {
       addGlobalHandlers();
     },
 
-    _onHidden: function(e) {
+    _onHidden: function (e) {
       e.target.removeEventListener(transEndEventName, this._onHidden);
       this._visible = false;
     },
@@ -149,7 +149,7 @@
       value ? classList.add('visible') : classList.remove('visible');
     },
 
-    _takePlace: function() {
+    _takePlace: function () {
       var rectObject = this.associatedWith.getBoundingClientRect();
       var x = rectObject.right + HORIZONTAL_OFFSET;
       var y = rectObject.top - rectObject.height;
@@ -166,7 +166,7 @@
      *
      * @param {String} Id of the element which is associated with the bubble
      */
-    get: function(id) {
+    get: function (id) {
       var instance = bubbles[id];
 
       if (!instance) {
@@ -176,5 +176,4 @@
       return instance;
     }
   };
-
 }(this);

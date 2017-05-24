@@ -14,7 +14,7 @@
   var _visibilityChanging = Promise.resolve();
 
   function isVisible() {
-    return _visibilityChanging.then(function() {
+    return _visibilityChanging.then(function () {
       return Chat.visible;
     });
   }
@@ -22,7 +22,7 @@
   function setVisibility(isVisible) {
     if (isVisible) {
       addHandlers();
-      return Chat.show().then(function() {
+      return Chat.show().then(function () {
         scrollTo();
       });
     } else {
@@ -85,7 +85,7 @@
     chatForm = chatWndElem.querySelector('#chatForm');
   }
 
-  var onSendClicked = function(evt) {
+  var onSendClicked = function (evt) {
     evt.preventDefault();
     if (!chatMsgInput.value.trim().length) {
       return;
@@ -97,7 +97,7 @@
     });
   };
 
-  var onKeyPress = function(myfield, evt) {
+  var onKeyPress = function  (myfield, evt) {
     var keycode;
     if (window.vent) {
       keycode = window.event.keyCode;
@@ -114,22 +114,22 @@
     }
   }.bind(undefined, chatMsgInput);
 
-  var onSubmit = function(evt) {
+  var onSubmit = function (evt) {
     evt.preventDefault();
     return false;
   };
 
-  var onClose = function(evt) {
+  var onClose = function (evt) {
     evt.preventDefault();
     evt.stopImmediatePropagation();
     _visibilityChanging = setVisibility(false);
   };
 
-  var onToggle = function(evt) {
+  var onToggle = function (evt) {
     Chat.isCollapsed() ? Chat.expand() : Chat.collapse();
   };
 
-  var onDrop = function(evt) {
+  var onDrop = function (evt) {
     evt.preventDefault();
     evt.stopPropagation();
     return false;
@@ -162,7 +162,7 @@
   function insertText(elemRoot, text) {
     var txtElems = TextProcessor.parse(text);
     var targetElem = HTMLElems.createElementAt(elemRoot, 'p');
-    txtElems.forEach(function(node) {
+    txtElems.forEach(function (node) {
       switch (node.type) {
         case TextProcessor.TYPE.URL:
           HTMLElems.createElementAt(targetElem, 'a',
@@ -178,13 +178,13 @@
     var item = HTMLElems.createElementAt(chatContent, 'li');
 
     var info = HTMLElems.createElementAt(item, 'p');
-    if ((data.sender || data.userName) === usrId ) {
+    if ((data.sender || data.userName) === usrId) {
       info.classList.add('yourself');
     }
     var time = data.time.toLowerCase();
     HTMLElems.createElementAt(info, 'span', null, time).classList.add('time');
-    HTMLElems.createElementAt(info, 'span', null, data.sender || data.userName).
-              classList.add('sender');
+    HTMLElems.createElementAt(info, 'span', null, data.sender || data.userName)
+      .classList.add('sender');
 
     insertText(info, data.text);
 
@@ -200,7 +200,7 @@
     return LazyLoader.dependencyLoad([
       '/js/helpers/textProcessor.js',
       '/js/components/chat.js'
-    ]).then(function() {
+    ]).then(function () {
       initHTMLElements();
       usrId = aUsrId;
       Chat.init();
@@ -213,5 +213,4 @@
   };
 
   exports.ChatView = ChatView;
-
 }(this);

@@ -357,7 +357,7 @@
     }
 
     function togglePublisherProperty(aProperty, aValue) {
-      publisherReady().then(function(aPublisher) {
+      publisherReady().then(function (aPublisher) {
         aPublisher['publish' + aProperty](aValue);
       });
     }
@@ -381,12 +381,13 @@
     var _screenShare;
 
     const FAKE_OTK_ANALYTICS = global.OTKAnalytics ||
-      function() { return {
-          addSessionInfo: function() {},
-          logEvent: function(a,b) {
-            console.log(a,b);
-          }
-          };
+      function () {
+        return {
+          addSessionInfo: function () {},
+          logEvent: function (a, b) {
+            console.log(a, b);
+          },
+        };
       };
 
     // TO-DO: Make this configurable
