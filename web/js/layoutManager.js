@@ -10,7 +10,7 @@
 
   var layouts;
 
-  var HANGOUT_BY_DEFAULT = 'hangout_vertical';
+  var HANGOUT_BY_DEFAULT = 'grid';
 
   function isOnGoing(layout) {
     return Object.getPrototypeOf(currentLayout) === layout.prototype;
@@ -40,7 +40,8 @@
       f2f_horizontal: F2FHorizontal,
       f2f_vertical: F2FVertical,
       hangout_horizontal: HangoutHorizontal,
-      hangout_vertical: HangoutVertical
+      hangout_vertical: HangoutVertical,
+      meet: MeetLayout
     };
     container = document.querySelector(selector);
     LayoutView.init(container);
@@ -48,6 +49,9 @@
     Utils.addEventsHandlers('layoutMenuView:', handlers, global);
     Utils.addEventsHandlers('layoutView:', handlers, global);
     Utils.addEventsHandlers('hangout:', handlers, global);
+
+    window.addEventListener('resize', rearrange);
+
     return enableHangoutScroll ? LazyLoader.load([
       '/js/layoutViewport.js', '/css/hangoutScroll.css'
     ]).then(function() {
@@ -104,15 +108,7 @@
   }
 
   function calculateCandidateLayout() {
-    var candidateLayout = null;
-
-    if (getTotal() > 2) {
-      candidateLayout = GRP_LAYOUTS[userLayout] ? layouts[userLayout] : Grid;
-    } else {
-      candidateLayout = F2F_LAYOUTS[userLayout] ? layouts[userLayout] : Float;
-    }
-
-    return candidateLayout;
+    return layouts['meet'];
   }
 
   var F2F_LAYOUTS = {
@@ -153,6 +149,7 @@
   global.LayoutManager = {
     init: init,
     append: append,
+    rearrange: rearrange,
     remove: remove,
     removeAll: removeAll,
     getItemById: getItemById

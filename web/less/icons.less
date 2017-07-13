@@ -207,7 +207,7 @@
   width: 20px;
   @media @smartphones {
     width: 16px;
-  }  
+  }
   height: 16px;
 }
 
@@ -266,6 +266,10 @@
   background-image: url("/images/icons/chat.svg");
 }
 
+[data-icon="dots"] {
+  background-image: url("/images/icons/dots.svg");
+}
+
 :hover > [data-icon="chat"], [data-icon="chat"]:after {
   background-image: url("/images/icons/chat_hover.svg");
 }
@@ -276,6 +280,11 @@
 
 :hover > [data-icon="end"], [data-icon="end"]:after {
   background-image: url("/images/icons/end_hover.svg");
+}
+
+[data-icon="flipCamera"] {
+  background-image: url("/images/icons/flip-camera.svg");
+  width: 27px !important;
 }
 
 #videoSwitch, #audioSwitch {

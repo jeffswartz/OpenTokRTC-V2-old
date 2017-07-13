@@ -7,7 +7,7 @@
       <meta name="apple-itunes-app" content="app-id=<%=iosAppId%>, app-argument=<%=iosURL%>">
     <% } %>
     <title>OpenTok</title>
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <!--[if IE]><link rel="shortcut icon" href="/favicon.ico"><![endif]-->
     <link rel="icon" href="/favicon.png">
@@ -26,32 +26,56 @@
 
     <script>
       window.isWebRTCVersion=<%=isWebRTCVersion%>
+      window.isSafariDemo=<%=isSafariDemo%>
       var isMobile = function() { return typeof window.orientation !== 'undefined'; }
 
-      var mobileSettings = function() {
-        document.getElementById("dock").classList.add("collapsed");
+      var commonIdsToHide = ['toggleSharing', 'manageRecordings', 'videoSwitchItem',
+        'audioSwitchItem', 'showFeedback', 'screenShareErrors', 'chooseLayoutItem'];
 
-        var ids = ['toggleSharing', 'manageRecordings', 'videoSwitch',
-          'audioSwitch', 'showFeedback', 'screenShareErrors'];
+      var hiddenWhenCollapsed = ['buttonDocumentation', 'buttonTalkToSales'];
+      var hiddenWhenExpanded = ['buttonContactItem'];
 
-        ids.forEach(function(id) {
+      var isMenuCollapsed = function() {
+        return window.innerWidth < 770;
+         // Consider iPad portrait (768) not width enough to show the menu expanded
+      }
+
+      var showItems = function(items, show) {
+        items.forEach(function(id) {
           var elem = document.getElementById(id);
-          elem && elem.classList.add('hidden');
+          !show && elem && elem.classList.add('hidden');
+          show && elem && elem.classList.remove('hidden');
         });
-      };
+      }
+
+      var onResize = function() {
+        var menuCollapsed = isMenuCollapsed();
+        if (menuCollapsed){
+          document.getElementById("dock").classList.add("collapsed");
+        } else {
+          document.getElementById("dock").classList.remove("collapsed");
+        }
+
+        showItems(hiddenWhenCollapsed, !menuCollapsed);
+        showItems(hiddenWhenExpanded, menuCollapsed);
+      }
 
       window.addEventListener('DOMContentLoaded', function loaded() {
         window.removeEventListener('DOMContentLoaded', loaded);
         if (isMobile()) {
-            mobileSettings();
+            document.getElementById("dock").classList.add("collapsed");
+            // We may want to comment this out if it is broken in the new browser:
+            document.getElementById('flipCameraItem').style.display = 'block';
         }
+        showItems(commonIdsToHide, false);
+        onResize();
       });
+
+      window.addEventListener('resize', onResize);
     </script>
 
+    <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     <script type="text/javascript" src="https://d3brof7fu9hlhe.cloudfront.net/static/snoop.js"></script>
-    <!--
-    <script type="text/javascript" src="https://static.opentok.com/webrtc/v2/js/opentok.min.js"></script>
-    -->
     <script defer src="/js/vendor/es6-promise.min.js"></script>
     <script defer type="text/javascript" src="/js/ie_polyfills.js"></script>
     <script defer src="/js/vendor/clipboard.min.js"></script>
@@ -69,7 +93,7 @@
           <span></span>
           <span></span>
         </div>
-        <h1>
+        <h1 class="header-room-name">
           <span id="roomName"><%= roomName %></span>
         </h1>
         <hr>
@@ -103,7 +127,7 @@
             </li>
             <% } %>
             <% } %>
-            <li>
+            <li id="chooseLayoutItem">
               <a id="chooseLayout"><i data-icon="layouts"></i><span>Change layout</span></a>
             </li>
             <li id="toggleChat">
@@ -112,7 +136,7 @@
             </li>
             <% if(!isWebRTCVersion) { %>
             <li>
-              <a id="endCall" class="danger"><i data-icon="end"></i><span>End meeting</span></a>
+              <a id="endCall" class="danger"><i data-icon="end"></i><span>Exit meeting</span></a>
             </li>
             <li class="surrounded bottom tight tooltip" tooltip="Stop receiving video">
               <a id="videoSwitch"><i data-icon="videoSwitch"></i><span>Stop receiving video</span></a>
@@ -121,20 +145,26 @@
               <a id="audioSwitch"><i data-icon="audioSwitch"></i><span>Mute all participants</span></a>
             </li>
             <% } else { %>
-            <li class="tooltip" tooltip="Stop receiving video">
+            <li id="videoSwitchItem" class="tooltip" tooltip="Stop receiving video">
               <a id="videoSwitch"><i data-icon="videoSwitch"></i><span>Stop receiving video</span></a>
             </li>
-            <li class="tooltip" tooltip="Mute all participants">
+            <li id="audioSwitchItem" class="tooltip" tooltip="Mute all participants">
               <a id="audioSwitch"><i data-icon="audioSwitch"></i><span>Mute all participants</span></a>
             </li>
             <li>
-              <a id="endCall" class="danger"><i data-icon="end"></i><span>End meeting</span></a>
+              <a id="endCall" class="danger"><i data-icon="end"></i><span>Exit meeting</span></a>
             </li>
-            <li class="bottom tooltip" tooltip="See Documentation">
+            <li id="flipCameraItem">
+              <a id="flipCamera"><i data-icon="flipCamera"></i><span>Switch camera</span></a>
+            </li>
+            <li id="buttonDocumentation" class="bottom tooltip" tooltip="See Documentation">
               <a href="https://tokbox.com/developer/" target="_blank" class="button see-documentation"><span>See Documentation</span></a>
             </li>
-            <li class="tooltip" tooltip="Talk to Sales">
-              <a href="https://tokbox.com/contact/sales" target="_blank" class="button talk-to-sales"><span>Talk to Sales</span></a>
+            <li id="buttonTalkToSales" class="tooltip" tooltip="Talk to Sales">
+              <a href="https://tokbox.com/account/user/signup" target="_blank" class="button sign-up-trial"><span>Sign up for a free trial</span></a>
+            </li>
+            <li id="buttonContactItem" class="tooltip">
+              <a id="buttonContact"><i data-icon="dots"></i><span></span></a>
             </li>
             <% } %>
           </ul>
@@ -189,7 +219,6 @@
         <div class="bubble-content">
           <p class="title">Meeting link has been copied <span class="check-mark">&#10003;</span></p>
           <p>Share link to add others to the meeting</p>
-          <input class="block" onclick="this.select();">
         </div>
       </section>
 
@@ -218,7 +247,14 @@
           </ul>
         </div>
       </section>
-    </section>
+
+      <section for="buttonContact" class="bubble compact">
+        <div class="bubble-content compact">
+          <p><a href="https://tokbox.com/developer/" target="_blank" class="button see-documentation"><span>See Documentation</span></a></p>
+          <hr/>
+          <p><a href="https://tokbox.com/account/user/signup" target="_blank" class="button sign-up-trial"><span>Sign up for a free trial</span></a></p>
+        </div>
+      </section>
 
     <section id="chat">
       <form class="dialog-chat" id="chatForm">
@@ -308,7 +344,7 @@
       <form class="tc-dialog">
         <i data-icon="close_gray" class="close"></i>
         <header><span class="msg"></span></header>
-        <hr>
+        <img>
         <p class="detail"></p>
         <footer>
           <button class="btn btn-blue btn-padding ctaarrow-white accept"></button>
@@ -317,7 +353,7 @@
     </section>
 
     <footer class="main">
-      Powered by TokBox
+      <img src="/images/powered-by-tokbox@2x.png">
     </footer>
 
     <script>

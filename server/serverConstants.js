@@ -75,6 +75,45 @@ E.ENABLE_ANNOTATIONS = { envVar: 'ENABLE_ANNOTATIONS', jsonPath: 'Screensharing.
 // We don't allow restricting it to some URIs because it doesn't work on Chrome
 E.ALLOW_IFRAMING = { envVar: 'ALLOW_IFRAMING', jsonPath: 'allowIframing', defaultValue: 'never' };
 
+// Default template for the room
+E.DEFAULT_TEMPLATE = { envVar: 'DEFAULT_TEMPLATE', jsonPath: 'defaultTemplate', defaultValue: 'room' };
+// Template secret for the room (if it does not exist, templating is not allowed)
+E.TEMPLATING_SECRET = { envVar: 'TEMPLATING_SECRET', jsonPath: 'templatingSecret' };
+
+// Data to include (or not) the iOS banner
+E.IOS_APP_ID = { envVar: 'IOS_APP_ID', jsonPath: 'IOSAppId' };
+
+E.IOS_URL_PREFIX = { envVar: 'IOS_URL_PREFIX', jsonPath: 'IOSUrlPrefix', defaultValue: '' };
+
+// To have several app main views, and to disable features...
+E.DEFAULT_INDEX_PAGE = { envVar: 'DEFAULT_INDEX_PAGE', jsonPath: 'defaultPageIndex', defaultValue: undefined };
+
+// A prefix for the room sessionInfo (sessionId + timestamp + inProgressArchiveId).
+// inProgressArchiveId will be present (and not undefined) only if there's an archive
+// operation running on that session.
+// Also note that while we don't actually need to store the in-progress archive operation
+// (and in fact it would be more robust if we didn't!) because we can just call listArchives
+// to get that, it's more efficient if we cache it locally.
+E.RED_ROOM_PREFIX = 'otrtc_room__';
+E.RED_ROOM_MATCHES = E.RED_ROOM_PREFIX + '*';
+
+// Set to 'true' if we want the sessions to be archived always.
+E.ARCHIVE_ALWAYS = 'tb_always_archive_session';
+
+// Comma separated list of disabled features/paths. Default value is all features enabled
+E.DISABLED_FEATURES = 'disabled_features';
+
+// Type of the session "routed" (mantis) or "relayed" (p2p)
+E.SESSION_MEDIA_TYPE = 'session_media_type';
+
+// ENUM for ensuring correct strings used when checking disabled features.
+E.FEATURES = {
+    FEEDBACK: 'feedback',
+    SCREENSHARING: 'screensharing',
+    ARCHIVING: 'archiving',
+    ARCHIVE_MANAGER: 'archive_manager',
+    ANNOTATIONS: 'annotations'
+}
 
 E.DEFAULT_TEMPLATE = { envVar: 'DEFAULT_TEMPLATE', jsonPath: 'defaultTemplate', defaultValue: 'room' };
 

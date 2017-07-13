@@ -34,7 +34,7 @@
     width: '100%',
     height: '100%',
     showControls: true,
-    resolution: '1280x720',
+    resolution: isSafariDemo ? '640x480' : '1280x720',
     style: {
       audioLevelDisplayMode: 'auto',
       buttonDisplayMode: 'off',
@@ -349,6 +349,9 @@
       _sharedStatus.roomMuted = roomMuted;
       setAudioStatus(roomMuted);
       sendSignalMuteAll(roomMuted, false);
+    },
+    'flipCamera': function(evt) {
+      otHelper.cyclePublisherCamera().then(console.log).catch(console.log);
     }
   };
 
@@ -696,6 +699,13 @@
       return loadAnnotations.then(function() { return aParams; });
     })
   .then(function(aParams) {
+    return LazyLoader.load([
+      '/bower_components/opentok-layout-js/opentok-layout.js'
+    ]).then(function() {
+      return aParams;
+    });
+  }).
+  then(function(aParams) {
     Utils.addEventsHandlers('roomView:', viewEventHandlers, exports);
     Utils.addEventsHandlers('roomStatus:', roomStatusHandlers, exports);
     RoomView.init(enableHangoutScroll, enableArchiveManager);
@@ -743,10 +753,17 @@
           return otHelper.publish(publisherElement, publisherOptions, {}).then(function() {
             setPublisherReady();
           }).catch(function(errInfo) {
-            if (errInfo.error.name === 'OT_CHROME_MICROPHONE_ACQUISITION_ERROR') {
-              Utils.sendEvent('roomController:chromePublisherError');
-              otHelper.disconnect();
+            switch (errInfo.error.name) {
+              case 'OT_CHROME_MICROPHONE_ACQUISITION_ERROR':
+                Utils.sendEvent('roomController:chromePublisherError');
+                break;
+              case 'OT_USER_MEDIA_ACCESS_DENIED':
+                Utils.sendEvent('roomController:cameraDeniedError',
+                  {browserName: Utils.browserName()});
+              default:
+                // Ignore other errors.
             }
+            otHelper.disconnect();
           });
         })
         .then(function() {

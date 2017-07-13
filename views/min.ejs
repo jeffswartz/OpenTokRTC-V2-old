@@ -18,7 +18,7 @@
     </script>
 
     <script type="text/javascript" src="https://d3brof7fu9hlhe.cloudfront.net/static/snoop.js"></script>
-    <script type="text/javascript" src="https://static.opentok.com/webrtc/v2/js/opentok.min.js"></script>
+    <script type="text/javascript" src="https://static.opentok.com/v2.12.0-beta/js/opentok.min.js"></script>
     <script defer src="/js/vendor/es6-promise.min.js"></script>
     <script defer type="text/javascript" src="/js/ie_polyfills.js"></script>
     <script defer src="/js/vendor/clipboard.min.js"></script>
@@ -70,7 +70,7 @@
               <a id="stopChat"><i data-icon="chat"></i><span>Close text chat</span></a>
             </li>
             <li>
-              <a id="endCall" class="danger"><i data-icon="end"></i><span>End meeting</span></a>
+              <a id="endCall" class="danger"><i data-icon="end"></i><span>Exit meeting</span></a>
             </li>
             <li class="surrounded bottom tight tooltip" tooltip="Stop receiving video">
               <a id="videoSwitch"><i data-icon="videoSwitch"></i><span>Stop receiving video</span></a>
@@ -94,7 +94,7 @@
     <section class="menu">
       <ul>
         <li>
-          <a id="endCall" class="btn btn-negative btn-padding ctaarrow-white"><span>End call</span></a>
+          <a id="endCall" class="btn btn-negative btn-padding ctaarrow-white"><span>Exit call</span></a>
         </li>
       </ul>
     </section>
@@ -133,7 +133,6 @@
         <div class="bubble-content">
           <p class="title">Meeting link has been copied</p>
           <p>Share link to add others to the meeting</p>
-          <input class="block" onclick="this.select();">
         </div>
       </section>
 
@@ -221,7 +220,7 @@
     </section>
 
     <footer class="main">
-      Powered by TokBox
+      <img src="/images/powered-by-tokbox@2x.png">
     </footer>
 
     <script>

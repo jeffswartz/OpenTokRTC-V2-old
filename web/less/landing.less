@@ -65,6 +65,11 @@ body {
     padding: 10px;
   }
 
+  @media (max-width: 500px) {
+    img.logo {
+      height: 50px;
+    }
+  }
   form {
     width: 100%;
     margin: 20px 0 0 0;
@@ -181,6 +186,56 @@ body {
     text-decoration: none;
   }
 
+  .extended-header {
+    img {
+      position: relative;
+      left: 33.3%;
+    }
+    p {
+      font-size: 24px;
+      color: @grey5;
+      margin-bottom: 32px;
+      text-align: center;
+      line-height: 32px
+    }
+    button {
+      width: 245px;
+      margin-bottom: 16px;
+    }
+  }
+}
+
+.tc-modal.contract {
+  header {
+    font-size: 24px;
+    @media @smartphones {
+      font-size: 20px;
+    }
+    color: @blueText;
+    padding-bottom: 10px;
+  }
+
+  p {
+    font-family: "Muli", arial;
+    color: @text;
+    font-weight: 300;
+    font-size: 16px;
+
+    @media @smartphones {
+      font-size: 12px;
+    }
+
+    a {
+      color: @blueText;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  }
+
+  .btn {
+    font-size: 14px;
+    margin: 0px;
+  }
 }
 
 .tc-modal.contract {

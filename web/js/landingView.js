@@ -38,6 +38,10 @@
   };
 
   var showContract = function() {
+document.activeElement.blur();
+document.querySelectorAll('input').forEach(function(element) {
+  element.blur();
+});
     var selector = '.tc-modal.contract';
     var ui = document.querySelector(selector);
 
@@ -47,7 +51,7 @@
           ui.addEventListener('click', function onClicked(evt) {
             var classList = evt.target.classList;
             var hasAccepted = classList.contains('accept');
-            if (!hasAccepted && !classList.contains('close')) {
+            if (evt.target.id !== 'switchAlerts' && !hasAccepted && !classList.contains('close')) {
               return;
             }
             evt.stopImmediatePropagation();
@@ -60,7 +64,7 @@
   };
 
   var navigateToRoom = function() {
-    var base = window.location.href.replace(/([^/]+)\.[^/]+$/, '');
+    var base = window.location.href.replace(/([^\/]+)\.[^\/]+$/, '');
     var url = base.concat('room/', room.value);
     var userName = document.getElementById('user').value.trim();
     if (userName) {

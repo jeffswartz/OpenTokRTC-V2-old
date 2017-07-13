@@ -10,7 +10,7 @@
   // in IE dynamic loading the library doesn't work. For the time being, as a stopgap measure,
   // loading it statically.
   if (dynamicOTLoad) {
-    var OPENTOK_API = 'https://static.opentok.com/webrtc/v2/js/opentok.min.js';
+    var OPENTOK_API = 'https://static.opentok.com/v2.12.0-beta/js/opentok.min.js';
     preReqSources.unshift(OPENTOK_API);
   }
 
@@ -378,6 +378,14 @@
       subscribeTo(aStream, 'Audio', value);
     }
 
+    function cyclePublisherCamera() {
+      return new Promise(function(resolve, reject) {
+        publisherReady().then(function(aPublisher) {
+          aPublisher._.demoOnlyCycleVideo().then(resolve).catch(reject);
+        });
+      });
+    }
+
     var _screenShare;
 
     const FAKE_OTK_ANALYTICS = global.OTKAnalytics ||
@@ -532,6 +540,7 @@
       toggleSubscribersVideo: toggleSubscribersVideo,
       togglePublisherAudio: togglePublisherAudio,
       togglePublisherVideo: togglePublisherVideo,
+      cyclePublisherCamera: cyclePublisherCamera,
       shareScreen: shareScreen,
       stopShareScreen: stopShareScreen,
       get isPublisherReady() {

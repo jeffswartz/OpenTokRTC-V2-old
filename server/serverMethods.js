@@ -113,6 +113,7 @@ function ServerMethods(aLogLevel, aModules) {
       var chromeExtId = config.get(C.CHROME_EXTENSION_ID);
 
       var isWebRTCVersion = config.get(C.DEFAULT_INDEX_PAGE) === 'opentokrtc';
+      var isSafariDemo = persistConfig[C.DEFAULT_INDEX_PAGE] === 'safaridemo';
 
       var firebaseConfigured =
               config.get(C.FIREBASE_DATA_URL) && config.get(C.FIREBASE_AUTH_SECRET);
@@ -155,6 +156,7 @@ function ServerMethods(aLogLevel, aModules) {
                 iosAppId,
                 iosUrlPrefix,
                 isWebRTCVersion,
+                isSafariDemo,
                 enableArchiving,
                 enableArchiveManager,
                 enableScreensharing,
@@ -209,8 +211,9 @@ function ServerMethods(aLogLevel, aModules) {
       .getKey(redisRoomPrefix + roomName)
       .then(_getUsableSessionInfo.bind(tbConfig.otInstance,
                                       tbConfig.maxSessionAgeMs,
-                                      tbConfig.archiveAlways))
-      .then((usableSessionInfo) => {
+                                      tbConfig.archiveAlways,
+                                      tbConfig.sessionMediaType))
+      .then(usableSessionInfo => {
         serverPersistence.setKeyEx(tbConfig.maxSessionAgeMs, redisRoomPrefix + roomName,
                                    JSON.stringify(usableSessionInfo));
         var sessionId = usableSessionInfo.sessionId;
@@ -265,7 +268,10 @@ function ServerMethods(aLogLevel, aModules) {
   function getRoot(aReq, aRes) {
     aRes
       .render('index.ejs', {
-        isWebRTCVersion: aReq.tbConfig.isWebRTCVersion,
+        isWebRTCVersion: aReq.tbConfig.isWebRTCVersion || false,
+        isSafariDemo: true,
+        features: C.FEATURES,
+        isDisabledFeature: aReq.tbConfig.isDisabledFeature,
       }, (err, html) => {
         if (err) {
           logger.error('getRoot. error: ', err);
@@ -294,7 +300,8 @@ function ServerMethods(aLogLevel, aModules) {
     aRes
       .render((template || tbConfig.defaultTemplate) + '.ejs',
       {
-        isWebRTCVersion: tbConfig.isWebRTCVersion,
+        isWebRTCVersion: aReq.tbConfig.isWebRTCVersion || false,
+        isSafariDemo: aReq.tbConfig.isSafariDemo || false,
         userName: userName || C.DEFAULT_USER_NAME,
         roomName: aReq.params.roomName,
         chromeExtensionId: tbConfig.chromeExtId,
@@ -318,11 +325,26 @@ function ServerMethods(aLogLevel, aModules) {
         }
       });
   }
+  // Returns the call complete page
+  function getDone(aReq, aRes) {
+    aRes.
+      render('done.ejs', {
+        isWebRTCVersion: aReq.tbConfig.isWebRTCVersion || false,
+      }, (err, html) => {
+        if (err) {
+          logger.error('getDone. error: ', err);
+          aRes.status(500).send(new ErrorInfo(500, 'Invalid Template'));
+        } else {
+          aRes.send(html);
+        }
+      }
+    );
+  }
 
   // Given a sessionInfo (which might be empty or non usable) returns a promise than will fullfill
   // to an usable sessionInfo. This function cannot be invoked directly, it has
   // to be bound so 'this' is a valid Opentok instance!
-  function _getUsableSessionInfo(aMaxSessionAge, aArchiveAlways, aSessionInfo) {
+  function _getUsableSessionInfo(aMaxSessionAge, aArchiveAlways, aSessionMediaType, aSessionInfo) {
     aSessionInfo = aSessionInfo && JSON.parse(aSessionInfo);
     return new Promise((resolve) => {
       var minLastUsage = Date.now() - aMaxSessionAge;
@@ -333,7 +355,12 @@ function ServerMethods(aLogLevel, aModules) {
 
       if (!aSessionInfo || aSessionInfo.lastUsage <= minLastUsage) {
         // We need to create a new session...
-        var sessionOptions = { mediaMode: 'routed' };
+        var sessionMediaType = 'routed';
+        if (aSessionMediaType === 'relayed') {
+          sessionMediaType = aSessionMediaType;
+        }
+        logger.log("Creating session with type: " + sessionMediaType);
+        var sessionOptions = { mediaMode: sessionMediaType };
         if (aArchiveAlways) {
           sessionOptions.archiveMode = 'always';
         }
@@ -384,7 +411,7 @@ function ServerMethods(aLogLevel, aModules) {
     serverPersistence
       .getKey(redisRoomPrefix + roomName)
       .then(_getUsableSessionInfo.bind(tbConfig.otInstance, tbConfig.maxSessionAgeMs,
-                                      tbConfig.archiveAlways))
+                                      tbConfig.archiveAlways, tbConfig.sessionMediaType))
       .then((usableSessionInfo) => {
         // Update the database. We could do this on getUsable...
         serverPersistence.setKeyEx(tbConfig.maxSessionAgeMs, redisRoomPrefix + roomName,
@@ -628,6 +655,7 @@ function ServerMethods(aLogLevel, aModules) {
     getRoom,
     getRoomInfo,
     postRoomArchive,
+    getDone,
     postUpdateArchiveInfo,
     getArchive,
     deleteArchive,

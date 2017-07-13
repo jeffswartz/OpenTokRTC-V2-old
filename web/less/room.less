@@ -52,6 +52,18 @@ body {
     h2, h3 {
       transform: translateY(5px);
     }
+
+    .header-room-name {
+      @media @smartphones {
+        height: 20px;
+        margin: 0px;
+
+
+        span {
+          font-size: 14px;
+        }
+      }
+    }
   }
 
   .menu {
@@ -97,13 +109,13 @@ body {
   .info {
     width: calc(~"100% - 80px");
     @media @smartphones {
-      width: calc(~"100% - 40px");
+      width: calc(~"100% - 36px");
     }
     background-color: #1a99ce;
     border-radius: 16px;
     border-top-left-radius: 0;
     margin: 15px 30px;
-    padding: 15px 15px 5px 15px;
+    padding: 15px 13px 5px 13px;
 
     #handler {
       width: 16px;
@@ -137,8 +149,11 @@ body {
       position: relative;
       word-break: break-all;
       overflow: hidden;
-      font-family: @muliRegularFont, arial;
-      font-size: 24px;
+      font-family: @muliRegularFont;
+      font-size: 20px;
+      @media @smartphones {
+        font-size: 17px;
+      }
       font-weight: 100;
       line-height: 28px;
       margin: 12px 0 0px 0;
@@ -237,6 +252,9 @@ body {
 
     .tc-list li.tight {
       padding: 0 0 2px 40px;
+      @media @smartphones {
+        padding: 3px 0 3px 12px;
+      }
 
       a {
         line-height: 30px;
@@ -270,6 +288,10 @@ body {
 
       [data-icon] {
         margin: 0 15px -3px 0;
+      }
+
+      [data-icon="dots"] {
+        margin-left: 0px !important;
       }
 
       &:hover,
@@ -359,6 +381,10 @@ body {
     }
 
     #startChat[data-unread-messages="0"] #unreadMsg {
+      display: none;
+    }
+
+    #flipCameraItem {
       display: none;
     }
   }
@@ -536,14 +562,21 @@ body {
 footer.main {
   position: fixed;
   bottom: 0;
-  right: 60px;
+  right: 20px;
+  @media @smartphones {
+    right: 10px;
+  }
   z-index: 1001;
-  width: 300px;
   color: #9b9c9b;
-  font-size: 8px;
+  font-size: 10px;
+  font-family: "AvantGardeGothicITCW01B 731069", arial;
   line-height: 19px;
-  height: 19px;
   text-align: right;
+  height: 24px;
+  img {
+    width: 118px;
+    height: 22px;
+  }
 }
 
 [data-chat-visible=true] footer.main {
@@ -567,4 +600,8 @@ footer.main {
 
 .main {
   width: 100%
+}
+
+.centered {
+  text-align: center;
 }

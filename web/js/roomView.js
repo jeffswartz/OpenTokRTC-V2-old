@@ -52,7 +52,7 @@
       head: 'Exit the Meeting',
       detail: 'You are going to exit the OpenTok Meeting Room. The call will continue with the ' +
               'remaining participants.',
-      button: 'End meeting'
+      button: 'Exit meeting'
     },
     sessionDisconnected: {
       head: 'Session disconected',
@@ -64,6 +64,26 @@
       head: 'Internal Chrome Error',
       detail: 'Failed to acquire microphone. This is a known Chrome bug. Please completely quit ' +
               'and restart your browser.',
+      button: 'Reload'
+    },
+    cameraDeniedErrorChrome: {
+      head: 'Camera and microphone access required',
+      detail: 'Click the camera icon in the address bar and allow this site to access your '
+        + 'camera and microphone. Then reload the page.',
+      image: '/images/browsers/chrome-camera-permissions@2x.png',
+      button: 'Reload'
+    },
+    cameraDeniedErrorFirefox: {
+      head: 'Camera and microphone access required',
+      detail: 'Click the camera or microphone icon in the address bar and delete the permission '
+        + 'settings that block the use of the camera and microphone. Then reload the page and '
+        + 'allow this site to use the camera and microphone.',
+      image: '/images/browsers/firefox-camera-permissions@2x.png',
+      button: 'Reload'
+    },
+    cameraDeniedErrorIE: {
+      head: 'Camera and microphone access required',
+      detail: 'Reload this page. Then grant the site access to your camera and microphone.',
       button: 'Reload'
     }
   };
@@ -169,6 +189,27 @@
       showConfirm(MODAL_TXTS.chromePublisherError).then(function() {
         document.location.reload();
       });
+    },
+    'cameraDeniedError': function(evt) {
+      var modalTxtError;
+      switch (evt.detail.browserName) {
+        case 'chrome':
+          modalTxtError = MODAL_TXTS.cameraDeniedErrorChrome;
+          break;
+        case 'firefox':
+          modalTxtError = MODAL_TXTS.cameraDeniedErrorFirefox;
+          break;
+        case 'ie':
+          modalTxtError = MODAL_TXTS.cameraDeniedErrorIE;
+          break;
+        default:
+          // No error for other browsers
+      }
+      if (modalTxtError) {
+        showConfirm(modalTxtError).then(function() {
+          document.location.reload();
+        });
+      }
     }
   };
 
@@ -199,6 +240,10 @@
     var title = dock.querySelector('.info h1');
     title.style.height = title.clientHeight + 'px';
   }
+
+  var transEndEventName =
+    ('WebkitTransition' in document.documentElement.style) ?
+     'webkitTransitionEnd' : 'transitionend';
 
   function createStreamView(streamId, type, controlBtns, name) {
     return LayoutManager.append(streamId, type, controlBtns, name);
@@ -292,6 +337,10 @@
     function loadModalText() {
       ui.querySelector(' header .msg').textContent = txt.head;
       ui.querySelector(' p.detail').innerHTML = txt.detail;
+      if (txt.image) {
+        ui.querySelector('img').src = txt.image;
+        ui.querySelector('img').style.display = 'block';
+      }
       ui.querySelector(' footer button.accept').textContent = txt.button;
     }
 
@@ -332,12 +381,18 @@
       switch (elem.id) {
         case 'addToCall':
           BubbleFactory.get('addToCall').toggle();
+          setTimeout(function() {
+            BubbleFactory.get('addToCall').toggle();
+          }, 3000);
           break;
         case 'viewRecordings':
           BubbleFactory.get('viewRecordings').toggle();
           break;
         case 'chooseLayout':
           BubbleFactory.get('chooseLayout').toggle();
+          break;
+        case 'buttonContact':
+          BubbleFactory.get('buttonContact').toggle();
           break;
         case 'startArchiving':
         case 'stopArchiving':
@@ -350,8 +405,7 @@
         case 'endCall':
           showConfirm(MODAL_TXTS.endCall).then(function(endCall) {
             if (endCall) {
-              RoomView.participantsNumber = 0;
-              Utils.sendEvent('roomView:endCall');
+              window.location.href = '/done';
             }
           });
           break;
@@ -377,6 +431,10 @@
           } else {
             setSwitchStatus(false, true, audioSwitch, 'roomView:muteAllSwitch');
           }
+          break;
+        case 'flipCamera':
+          Utils.sendEvent('roomView:flipCamera');
+          break;
       }
     });
 
@@ -403,6 +461,15 @@
     Utils.addEventsHandlers('chat:', chatEvents);
     Utils.addEventsHandlers('chatView:', chatViews);
     Utils.addEventsHandlers('hangout:', hangoutEvents);
+
+    var dockElement = document.getElementById('dock');
+    dockElement.addEventListener(transEndEventName, function(event) {
+      // Rearrange the video layout when the dock changes width:
+      if (event.propertyName === 'width') {
+        LayoutManager.rearrange();
+      };
+    });
+
   };
 
   function toggleScreenSharing(evt) {
@@ -416,13 +483,10 @@
   };
 
   var addClipboardFeature = function() {
-    var input = document.querySelector('.bubble[for="addToCall"] input');
-    var urlToShare = getURLtoShare();
-    input.value = urlToShare;
-    var clipboard = new Clipboard(document.querySelector('#addToCall'), { // eslint-disable-line no-unused-vars
-      text: function() {
-        return urlToShare;
-      }
+    var clipboard = new Clipboard(document.querySelector('#addToCall'), {
+        text: function() {
+            return getURLtoShare();
+        }
     });
   };
 
