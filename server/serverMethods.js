@@ -117,8 +117,8 @@ function ServerMethods(aLogLevel, aModules) {
       var firebaseConfigured =
               config.get(C.FIREBASE_DATA_URL) && config.get(C.FIREBASE_AUTH_SECRET);
 
-      var enableArchiving = config.get(C.ENABLE_ARCHIVING, config);
-      var enableArchiveManager = enableArchiving && config.get(C.ENABLE_ARCHIVE_MANAGER);
+      var enableArchiving = false; config.get(C.ENABLE_ARCHIVING, config);
+      var enableArchiveManager = false; enableArchiving && config.get(C.ENABLE_ARCHIVE_MANAGER);
       var enableScreensharing = config.get(C.ENABLE_SCREENSHARING);
       var enableAnnotations = enableScreensharing && config.get(C.ENABLE_ANNOTATIONS);
       var enableFeedback = config.get(C.ENABLE_FEEDBACK);
